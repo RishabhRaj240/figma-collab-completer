@@ -343,14 +343,14 @@ const Index = () => {
                 </div>
               </div>
               <div className="hidden md:block">
-                <div className="h-full bg-[url('/contact-image.jpg')] bg-cover bg-center rounded-lg"></div>
+                <div className="h-full bg-[url('/lovable-uploads/72d13167-60a9-46de-93f7-a861c71d2bd5.png')] bg-cover bg-center rounded-lg"></div>
               </div>
             </div>
           </div>
         </div>
       </section>
       
-      {/* Footer - Updated to match Figma */}
+      {/* Footer */}
       <footer className="bg-gray-900 text-white pt-16 pb-8">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
