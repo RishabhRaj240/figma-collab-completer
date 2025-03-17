@@ -1,6 +1,5 @@
-
 import { Link } from "react-router-dom";
-import { Search, MapPin, Calendar, ChevronRight, ChevronDown } from "lucide-react";
+import { Search, MapPin, Calendar, ChevronRight, ChevronDown, Mail, Phone, MapPin as LocationPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -8,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import TravelCard from "@/components/TravelCard";
 import Testimonial from "@/components/Testimonial";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/ui/navigation-menu";
+import { Textarea } from "@/components/ui/textarea";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("flights");
@@ -266,7 +266,91 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Footer */}
+      {/* Contact Us Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4 lg:px-0">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Contact Us</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Have questions about our travel packages or need custom arrangements? 
+              Our travel experts are here to help you plan your perfect journey.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Phone className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+              <h3 className="font-bold mb-2">Call Us</h3>
+              <p className="text-gray-600 mb-3">Mon-Fri from 8am to 5pm</p>
+              <p className="font-medium">+1 (555) 123-4567</p>
+            </Card>
+            
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+              <h3 className="font-bold mb-2">Email Us</h3>
+              <p className="text-gray-600 mb-3">We'll respond within 24 hours</p>
+              <p className="font-medium">info@travelo.com</p>
+            </Card>
+            
+            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                  <LocationPin className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+              <h3 className="font-bold mb-2">Visit Us</h3>
+              <p className="text-gray-600 mb-3">Our main office location</p>
+              <p className="font-medium">123 Travel Street, Adventure City</p>
+            </Card>
+          </div>
+          
+          <div className="mt-12 bg-white p-8 rounded-xl shadow-md">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-xl font-bold mb-4">Send Us a Message</h3>
+                <p className="text-gray-600 mb-6">
+                  Fill out the form and our team will get back to you within 24 hours.
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Your Name</label>
+                    <Input placeholder="John Doe" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Email Address</label>
+                    <Input placeholder="john@example.com" type="email" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Subject</label>
+                    <Input placeholder="How can we help you?" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Message</label>
+                    <Textarea 
+                      placeholder="Tell us more about your travel plans..." 
+                      className="min-h-[120px]"
+                    />
+                  </div>
+                  <Button className="w-full mt-2">Send Message</Button>
+                </div>
+              </div>
+              <div className="hidden md:block">
+                <div className="h-full bg-[url('/contact-image.jpg')] bg-cover bg-center rounded-lg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Footer - Updated to match Figma */}
       <footer className="bg-gray-900 text-white pt-16 pb-8">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
@@ -276,40 +360,64 @@ const Index = () => {
                 Making the world a better place through exceptional travel experiences.
               </p>
               <div className="flex gap-4">
-                <a href="#" className="text-gray-400 hover:text-white">FB</a>
-                <a href="#" className="text-gray-400 hover:text-white">TW</a>
-                <a href="#" className="text-gray-400 hover:text-white">IG</a>
-                <a href="#" className="text-gray-400 hover:text-white">YT</a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
+                  <span className="sr-only">Facebook</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
+                  <span className="sr-only">Twitter</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
+                  <span className="sr-only">Instagram</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+                </a>
+                <a href="#" className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
+                  <span className="sr-only">YouTube</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path><path d="m10 15 5-3-5-3z"></path></svg>
+                </a>
               </div>
             </div>
             
             <div>
               <h3 className="text-lg font-bold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">About Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Press</a></li>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Press</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Gift Cards</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Magazine</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="text-lg font-bold mb-4">Support</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">FAQs</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQs</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Trust & Safety</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-bold mb-4">Contact</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>123 Travel Street</li>
-                <li>Adventure City, AC 12345</li>
-                <li>info@travelo.com</li>
-                <li>+1 (555) 123-4567</li>
+              <h3 className="text-lg font-bold mb-4">Get in Touch</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li className="flex items-start">
+                  <LocationPin className="w-5 h-5 mr-2 mt-0.5 text-gray-500" />
+                  <span>123 Travel Street<br />Adventure City, AC 12345</span>
+                </li>
+                <li className="flex items-center">
+                  <Mail className="w-5 h-5 mr-2 text-gray-500" />
+                  <span>info@travelo.com</span>
+                </li>
+                <li className="flex items-center">
+                  <Phone className="w-5 h-5 mr-2 text-gray-500" />
+                  <span>+1 (555) 123-4567</span>
+                </li>
               </ul>
             </div>
           </div>
@@ -320,9 +428,9 @@ const Index = () => {
                 © 2023 Travelo. All rights reserved.
               </p>
               <div className="flex gap-6">
-                <a href="#" className="text-gray-400 hover:text-white text-sm">Terms of Service</a>
-                <a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
-                <a href="#" className="text-gray-400 hover:text-white text-sm">Cookie Policy</a>
+                <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</a>
+                <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
+                <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</a>
               </div>
             </div>
           </div>
