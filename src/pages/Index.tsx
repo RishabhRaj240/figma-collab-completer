@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -310,14 +309,7 @@ const Index = () => {
         <img
           src="/2 Plane Image.png"
           alt="Airplane"
-          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto animate-[float_5s_ease-in-out_infinite]"
-          style={{
-            animation: "float 5s ease-in-out infinite",
-            "@keyframes float": {
-              "0%, 100%": { transform: "translateY(0)" },
-              "50%": { transform: "translateY(-15px)" }
-            }
-          }}
+          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto animate-float"
         />
         <div className="container mx-auto px-4 lg:px-0 relative z-10 flex justify-start items-end h-full pb-10 lg:pb-16">
           <div className="max-w-2xl mb-12 lg:mb-14 animate-fade-in">
