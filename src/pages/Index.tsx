@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -11,10 +12,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, FormEvent, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import TravelCard from "@/components/TravelCard";
 import Testimonial from "@/components/Testimonial";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useToast } from "@/hooks/use-toast";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -24,9 +28,210 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Textarea } from "@/components/ui/textarea";
+import { z } from "zod";
+
+// Form validation schemas
+const newsletterSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
+const searchSchema = z.object({
+  location: z.string().min(2, "Please enter a destination"),
+  checkIn: z.string().optional(),
+  checkOut: z.string().optional(),
+});
+
+const contactSchema = z.object({
+  name: z.string().min(2, "Please enter your name"),
+  email: z.string().email("Please enter a valid email address"),
+  subject: z.string().min(2, "Please enter a subject"),
+  message: z.string().min(10, "Please enter a message (min 10 characters)"),
+});
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("flights");
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterError, setNewsletterError] = useState("");
+  const { toast } = useToast();
+  
+  // Search form state
+  const [searchLocation, setSearchLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  
+  // Contact form state
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactLoading, setContactLoading] = useState(false);
+  
+  // Add animation hooks
+  const [searchFormRef] = useAutoAnimate();
+  const [popularDestinationsRef] = useAutoAnimate();
+  const [specialOffersRef] = useAutoAnimate();
+  const [testimonialsRef] = useAutoAnimate();
+  const [newsletterRef] = useAutoAnimate();
+  const [contactRef] = useAutoAnimate();
+  
+  // Search destinations functionality
+  const handleSearch = async (e: FormEvent) => {
+    e.preventDefault();
+    setSearchLoading(true);
+    
+    try {
+      // Validate form
+      searchSchema.parse({
+        location: searchLocation,
+        checkIn,
+        checkOut,
+      });
+      
+      // In a real app, you would make an API call here
+      // Simulating API call with timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Search successful!",
+        description: `Searching for ${activeTab} in ${searchLocation}`,
+      });
+      
+      // Additional logic for handling search results would go here
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast({
+          title: "Search error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Search error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+  
+  // Newsletter subscription functionality
+  const handleNewsletterSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setNewsletterLoading(true);
+    setNewsletterError("");
+    
+    try {
+      // Validate email
+      newsletterSchema.parse({ email: newsletterEmail });
+      
+      // In a real app, you would make an API call to your newsletter service
+      // Simulating API call with timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Subscription successful!",
+        description: "Thank you for subscribing to our newsletter.",
+      });
+      
+      setNewsletterEmail("");
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        setNewsletterError(error.errors[0].message);
+      } else {
+        setNewsletterError("Failed to subscribe. Please try again.");
+      }
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
+  
+  // Contact form functionality
+  const handleContactSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setContactLoading(true);
+    
+    try {
+      // Validate form
+      contactSchema.parse({
+        name: contactName,
+        email: contactEmail,
+        subject: contactSubject,
+        message: contactMessage,
+      });
+      
+      // In a real app, you would make an API call to your email service
+      // Simulating API call with timeout
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Message sent!",
+        description: "Thank you for contacting us. We'll get back to you soon.",
+      });
+      
+      // Reset form
+      setContactName("");
+      setContactEmail("");
+      setContactSubject("");
+      setContactMessage("");
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0];
+        toast({
+          title: "Form error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Form error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
+  // Scroll animation using IntersectionObserver
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+    
+    const handleIntersection = (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fade-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+    
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    
+    // Get all sections that need animation
+    const sections = document.querySelectorAll('.animate-on-scroll');
+    sections.forEach(section => {
+      observer.observe(section);
+    });
+    
+    return () => {
+      sections.forEach(section => {
+        observer.unobserve(section);
+      });
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -34,14 +239,16 @@ const Index = () => {
       <header className="container mx-auto py-6 px-4 lg:px-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="text-primary font-bold text-2xl">Travelo</span>
+            <Link to="/">
+              <span className="text-primary font-bold text-2xl">Travelo</span>
+            </Link>
           </div>
 
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink className="font-medium" href="#">
-                  Home
+                <NavigationMenuLink className="font-medium" asChild>
+                  <Link to="/">Home</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -50,33 +257,43 @@ const Index = () => {
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="p-4 w-[200px]">
-                    <div className="font-medium py-2">Places</div>
-                    <div className="font-medium py-2">Experiences</div>
-                    <div className="font-medium py-2">Adventures</div>
+                    <div className="font-medium py-2 cursor-pointer hover:text-primary transition-colors">Places</div>
+                    <div className="font-medium py-2 cursor-pointer hover:text-primary transition-colors">Experiences</div>
+                    <div className="font-medium py-2 cursor-pointer hover:text-primary transition-colors">Adventures</div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className="font-medium" href="#">
-                  Special Deals
+                <NavigationMenuLink className="font-medium" asChild>
+                  <Link to="/">Special Deals</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className="font-medium" href="#">
-                  Contact
+                <NavigationMenuLink className="font-medium" asChild>
+                  <Link to="/">Contact</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
 
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="hidden md:inline-flex">
-              Login
-            </Button>
-            <Button className="hidden md:inline-flex">Sign Up</Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Search className="h-5 w-5" />
-            </Button>
+            <SignedIn>
+              <Button variant="outline" className="hidden md:inline-flex" asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <Button variant="outline" className="hidden md:inline-flex" asChild>
+                <Link to="/sign-in">Login</Link>
+              </Button>
+              <Button className="hidden md:inline-flex" asChild>
+                <Link to="/sign-up">Sign Up</Link>
+              </Button>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Search className="h-5 w-5" />
+              </Button>
+            </SignedOut>
           </div>
         </div>
       </header>
@@ -93,10 +310,17 @@ const Index = () => {
         <img
           src="/2 Plane Image.png"
           alt="Airplane"
-          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto"
+          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto animate-[float_5s_ease-in-out_infinite]"
+          style={{
+            animation: "float 5s ease-in-out infinite",
+            "@keyframes float": {
+              "0%, 100%": { transform: "translateY(0)" },
+              "50%": { transform: "translateY(-15px)" }
+            }
+          }}
         />
         <div className="container mx-auto px-4 lg:px-0 relative z-10 flex justify-start items-end h-full pb-10 lg:pb-16">
-          <div className="max-w-2xl mb-12 lg:mb-14">
+          <div className="max-w-2xl mb-12 lg:mb-14 animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               Explore the Beauty of the World
             </h1>
@@ -105,7 +329,7 @@ const Index = () => {
               hotels, flights, and vacation packages.
             </p>
             <div className="flex gap-4">
-              <Button size="lg">Explore Now</Button>
+              <Button size="lg" className="animate-pulse">Explore Now</Button>
               <Button
                 variant="outline"
                 size="lg"
@@ -120,74 +344,101 @@ const Index = () => {
 
       {/* Search Box */}
       <section className="container mx-auto px-4 lg:px-0 -mt-16 relative z-20">
-        <Card className="shadow-lg rounded-xl p-2">
+        <Card className="shadow-lg rounded-xl p-2 animate-fade-in">
           <div className="flex gap-2 mb-4 overflow-x-auto md:overflow-visible">
             <Button
               variant={activeTab === "flights" ? "default" : "ghost"}
               onClick={() => setActiveTab("flights")}
+              className="transition-all duration-300"
             >
               Flights
             </Button>
             <Button
               variant={activeTab === "hotels" ? "default" : "ghost"}
               onClick={() => setActiveTab("hotels")}
+              className="transition-all duration-300"
             >
               Hotels
             </Button>
             <Button
               variant={activeTab === "tours" ? "default" : "ghost"}
               onClick={() => setActiveTab("tours")}
+              className="transition-all duration-300"
             >
               Tours
             </Button>
             <Button
               variant={activeTab === "cars" ? "default" : "ghost"}
               onClick={() => setActiveTab("cars")}
+              className="transition-all duration-300"
             >
               Car Rentals
             </Button>
           </div>
 
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Location
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input className="pl-10" placeholder="Where are you going?" />
+            <form ref={searchFormRef} onSubmit={handleSearch}>
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Location
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input 
+                      className="pl-10" 
+                      placeholder="Where are you going?" 
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Check In
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input 
+                      className="pl-10" 
+                      type="date"
+                      value={checkIn}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">
+                    Check Out
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Input 
+                      className="pl-10" 
+                      type="date"
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">&nbsp;</label>
+                  <Button 
+                    className="w-full"
+                    type="submit"
+                    disabled={searchLoading}
+                  >
+                    {searchLoading ? "Searching..." : "Search"}
+                  </Button>
                 </div>
               </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Check In
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input className="pl-10" placeholder="Add date" type="date" />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  Check Out
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input className="pl-10" placeholder="Add date" type="date" />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">&nbsp;</label>
-                <Button className="w-full">Search</Button>
-              </div>
-            </div>
+            </form>
           </CardContent>
         </Card>
       </section>
 
       {/* Popular Destinations */}
-      <section className="container mx-auto px-4 lg:px-0 py-16">
+      <section className="container mx-auto px-4 lg:px-0 py-16 animate-on-scroll opacity-0">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold">
             Popular Destinations
@@ -197,7 +448,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div ref={popularDestinationsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <TravelCard
             image="/3 Image.png"
             title="Bali, Indonesia"
@@ -223,7 +474,7 @@ const Index = () => {
       </section>
 
       {/* Special Offers */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 py-16 animate-on-scroll opacity-0">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">Special Offers</h2>
@@ -232,7 +483,7 @@ const Index = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div ref={specialOffersRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <TravelCard
               image="/6 Image.png"
               title="Summer Sale"
@@ -262,7 +513,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="container mx-auto px-4 lg:px-0 py-16">
+      <section className="container mx-auto px-4 lg:px-0 py-16 animate-on-scroll opacity-0">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             What Our Customers Say
@@ -273,7 +524,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div ref={testimonialsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <Testimonial
             name="Sarah Johnson"
             location="New York, USA"
@@ -299,7 +550,7 @@ const Index = () => {
       </section>
 
       {/* Newsletter */}
-      <section className="bg-primary py-16">
+      <section ref={newsletterRef} className="bg-primary py-16 animate-on-scroll opacity-0">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -309,21 +560,36 @@ const Index = () => {
               Stay updated with our latest offers, travel tips, and exclusive
               deals by subscribing to our newsletter.
             </p>
-            <div className="flex flex-col md:flex-row gap-3">
-              <Input
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                placeholder="Enter your email address"
-              />
-              <Button className="bg-white text-primary hover:bg-white/90">
-                Subscribe
-              </Button>
-            </div>
+            <form onSubmit={handleNewsletterSubmit} className="space-y-4">
+              <div className="flex flex-col md:flex-row gap-3">
+                <Input
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                  placeholder="Enter your email address"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  type="email"
+                  disabled={newsletterLoading}
+                />
+                <Button 
+                  className="bg-white text-primary hover:bg-white/90"
+                  type="submit"
+                  disabled={newsletterLoading}
+                >
+                  {newsletterLoading ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </div>
+              {newsletterError && (
+                <p className="text-white/90 bg-white/10 p-2 rounded text-sm">
+                  {newsletterError}
+                </p>
+              )}
+            </form>
           </div>
         </div>
       </section>
 
       {/* Contact Us Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 animate-on-scroll opacity-0">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Contact Us</h2>
@@ -371,8 +637,8 @@ const Index = () => {
             </Card>
           </div>
 
-          <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="mt-12 bg-white p-8 rounded-xl shadow-md">
+          <div ref={contactRef} className="flex justify-center items-center mt-12">
+            <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-4xl">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-xl font-bold mb-4">Send Us a Message</h3>
@@ -380,24 +646,40 @@ const Index = () => {
                     Fill out the form and our team will get back to you within
                     24 hours.
                   </p>
-                  <div className="space-y-4">
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">
                         Your Name
                       </label>
-                      <Input placeholder="John Doe" />
+                      <Input 
+                        placeholder="John Doe" 
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        disabled={contactLoading}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">
                         Email Address
                       </label>
-                      <Input placeholder="john@example.com" type="email" />
+                      <Input 
+                        placeholder="john@example.com" 
+                        type="email"
+                        value={contactEmail}
+                        onChange={(e) => setContactEmail(e.target.value)}
+                        disabled={contactLoading}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">
                         Subject
                       </label>
-                      <Input placeholder="How can we help you?" />
+                      <Input 
+                        placeholder="How can we help you?" 
+                        value={contactSubject}
+                        onChange={(e) => setContactSubject(e.target.value)}
+                        disabled={contactLoading}
+                      />
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-1">
@@ -406,10 +688,19 @@ const Index = () => {
                       <Textarea
                         placeholder="Tell us more about your travel plans..."
                         className="min-h-[120px]"
+                        value={contactMessage}
+                        onChange={(e) => setContactMessage(e.target.value)}
+                        disabled={contactLoading}
                       />
                     </div>
-                    <Button className="w-full mt-2">Send Message</Button>
-                  </div>
+                    <Button 
+                      className="w-full mt-2"
+                      type="submit"
+                      disabled={contactLoading}
+                    >
+                      {contactLoading ? "Sending..." : "Send Message"}
+                    </Button>
+                  </form>
                 </div>
                 <div className="hidden md:block">
                   <div className="h-full bg-[url('/lovable-uploads/72d13167-60a9-46de-93f7-a861c71d2bd5.png')] bg-cover bg-center rounded-lg"></div>
