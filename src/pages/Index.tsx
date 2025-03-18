@@ -67,13 +67,13 @@ const Index = () => {
   const [contactMessage, setContactMessage] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
   
-  // Add animation hooks
-  const [searchFormRef] = useAutoAnimate();
-  const [popularDestinationsRef] = useAutoAnimate();
-  const [specialOffersRef] = useAutoAnimate();
-  const [testimonialsRef] = useAutoAnimate();
-  const [newsletterRef] = useAutoAnimate();
-  const [contactRef] = useAutoAnimate();
+  // Add animation hooks with proper typing
+  const [searchFormRef] = useAutoAnimate<HTMLFormElement>();
+  const [popularDestinationsRef] = useAutoAnimate<HTMLDivElement>();
+  const [specialOffersRef] = useAutoAnimate<HTMLDivElement>();
+  const [testimonialsRef] = useAutoAnimate<HTMLDivElement>();
+  const [newsletterRef] = useAutoAnimate<HTMLElement>();
+  const [contactRef] = useAutoAnimate<HTMLDivElement>();
   
   // Search destinations functionality
   const handleSearch = async (e: FormEvent) => {
@@ -208,7 +208,7 @@ const Index = () => {
       threshold: 0.1
     };
     
-    const handleIntersection = (entries, observer) => {
+    const handleIntersection = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('animate-fade-in');
