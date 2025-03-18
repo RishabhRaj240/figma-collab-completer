@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -339,10 +338,10 @@ const Index = () => {
             </SignedIn>
             <SignedOut>
               <Button variant="outline" className="hidden md:inline-flex" asChild>
-                <Link to="/sign-in">Login</Link>
+                <a href="/sign-in" target="_blank" rel="noopener noreferrer">Login</a>
               </Button>
               <Button className="hidden md:inline-flex" asChild>
-                <Link to="/sign-up">Sign Up</Link>
+                <a href="/sign-up" target="_blank" rel="noopener noreferrer">Sign Up</a>
               </Button>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Search className="h-5 w-5" />
@@ -360,7 +359,6 @@ const Index = () => {
           className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-black/30"></div>
-        {/* Airplane Image with GSAP animation */}
         <img
           ref={airplaneRef}
           src="/2 Plane Image.png"
@@ -498,7 +496,6 @@ const Index = () => {
 
         <div ref={popularDestinationsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <TravelCard
-            className="card-item"
             image="/3 Image.png"
             title="Bali, Indonesia"
             description="A beautiful tropical paradise with stunning beaches and vibrant culture."
@@ -506,7 +503,6 @@ const Index = () => {
             rating={4.8}
           />
           <TravelCard
-            className="card-item"
             image="/4 Image.png"
             title="Paris, France"
             description="Explore the city of love with its iconic landmarks and charming streets."
@@ -514,7 +510,6 @@ const Index = () => {
             rating={4.9}
           />
           <TravelCard
-            className="card-item"
             image="/5 Image.png"
             title="Santorini, Greece"
             description="Enjoy breathtaking views of the Aegean Sea from white-washed buildings."
@@ -536,7 +531,6 @@ const Index = () => {
 
           <div ref={specialOffersRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <TravelCard
-              className="card-item"
               image="/6 Image.png"
               title="Summer Sale"
               description="Up to 30% off on summer vacation packages to tropical destinations."
@@ -545,7 +539,6 @@ const Index = () => {
               rating={4.6}
             />
             <TravelCard
-              className="card-item"
               image="/7 Image.png"
               title="Weekend Getaway"
               description="Perfect short trips to recharge and explore new places."
@@ -554,7 +547,6 @@ const Index = () => {
               rating={4.5}
             />
             <TravelCard
-              className="card-item"
               image="/8 Image.png"
               title="Luxury Retreat"
               description="Experience luxury accommodations with exclusive amenities."
@@ -580,7 +572,6 @@ const Index = () => {
 
         <div ref={testimonialsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <Testimonial
-            className="card-item"
             name="Sarah Johnson"
             location="New York, USA"
             image="/lady1.jpg"
@@ -588,7 +579,6 @@ const Index = () => {
             text="My trip to Bali was absolutely perfect! Travelo took care of everything and the service was exceptional."
           />
           <Testimonial
-            className="card-item"
             name="David Chen"
             location="Toronto, Canada"
             image="/male.jpg"
@@ -596,7 +586,6 @@ const Index = () => {
             text="The tour packages are well-planned and offer great value. I've used Travelo for three trips now and have never been disappointed."
           />
           <Testimonial
-            className="card-item"
             name="Maria Rodriguez"
             location="Madrid, Spain"
             image="/lady2.jpg"
