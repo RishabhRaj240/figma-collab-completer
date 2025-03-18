@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -15,7 +16,6 @@ import { useState, FormEvent, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import TravelCard from "@/components/TravelCard";
 import Testimonial from "@/components/Testimonial";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useToast } from "@/hooks/use-toast";
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import {
@@ -28,6 +28,11 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { z } from "zod";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register ScrollTrigger with GSAP
+gsap.registerPlugin(ScrollTrigger);
 
 // Form validation schemas
 const newsletterSchema = z.object({
@@ -67,13 +72,15 @@ const Index = () => {
   const [contactMessage, setContactMessage] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
   
-  // Add animation hooks with proper typing
-  const [searchFormRef] = useAutoAnimate<HTMLFormElement>();
-  const [popularDestinationsRef] = useAutoAnimate<HTMLDivElement>();
-  const [specialOffersRef] = useAutoAnimate<HTMLDivElement>();
-  const [testimonialsRef] = useAutoAnimate<HTMLDivElement>();
-  const [newsletterRef] = useAutoAnimate<HTMLElement>();
-  const [contactRef] = useAutoAnimate<HTMLDivElement>();
+  // GSAP refs instead of auto-animate
+  const searchFormRef = useRef<HTMLFormElement>(null);
+  const popularDestinationsRef = useRef<HTMLDivElement>(null);
+  const specialOffersRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const newsletterRef = useRef<HTMLElement>(null);
+  const contactRef = useRef<HTMLDivElement>(null);
+  const airplaneRef = useRef<HTMLImageElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
   
   // Search destinations functionality
   const handleSearch = async (e: FormEvent) => {
@@ -200,35 +207,83 @@ const Index = () => {
     }
   };
 
-  // Scroll animation using IntersectionObserver
+  // Initialize GSAP animations
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
-    
-    const handleIntersection = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate-fade-in');
-          observer.unobserve(entry.target);
-        }
-      });
-    };
-    
-    const observer = new IntersectionObserver(handleIntersection, observerOptions);
-    
-    // Get all sections that need animation
-    const sections = document.querySelectorAll('.animate-on-scroll');
-    sections.forEach(section => {
-      observer.observe(section);
+    // Hero section animations
+    gsap.fromTo(
+      heroContentRef.current,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+    );
+
+    // Airplane floating animation
+    gsap.to(airplaneRef.current, {
+      y: -15,
+      duration: 2.5,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut"
     });
+
+    // Search box animation
+    gsap.fromTo(
+      searchFormRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: "back.out(1.7)" }
+    );
+
+    // ScrollTrigger animations for sections
+    const animateSections = [
+      { ref: popularDestinationsRef.current, delay: 0 },
+      { ref: specialOffersRef.current, delay: 0.1 },
+      { ref: testimonialsRef.current, delay: 0.2 },
+      { ref: newsletterRef.current, delay: 0 },
+      { ref: contactRef.current, delay: 0.1 }
+    ];
+
+    animateSections.forEach(({ ref, delay }) => {
+      if (ref) {
+        ScrollTrigger.create({
+          trigger: ref,
+          start: "top 80%",
+          onEnter: () => {
+            gsap.fromTo(
+              ref,
+              { opacity: 0, y: 40 },
+              { opacity: 1, y: 0, duration: 0.8, delay, ease: "power2.out" }
+            );
+          }
+        });
+      }
+    });
+
+    // Animate cards inside sections
+    const sections = [popularDestinationsRef.current, specialOffersRef.current, testimonialsRef.current];
     
+    sections.forEach(section => {
+      if (section) {
+        const cards = section.querySelectorAll('.card-item');
+        gsap.set(cards, { opacity: 0, y: 30 });
+        
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top 70%",
+          onEnter: () => {
+            gsap.to(cards, {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              stagger: 0.15,
+              ease: "power2.out"
+            });
+          }
+        });
+      }
+    });
+
+    // Clean up on component unmount
     return () => {
-      sections.forEach(section => {
-        observer.unobserve(section);
-      });
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
   }, []);
 
@@ -305,14 +360,15 @@ const Index = () => {
           className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
         />
         <div className="absolute inset-0 bg-black/30"></div>
-        {/* Airplane Image */}
+        {/* Airplane Image with GSAP animation */}
         <img
+          ref={airplaneRef}
           src="/2 Plane Image.png"
           alt="Airplane"
-          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto animate-float"
+          className="absolute bottom-[10px] right-10 w-[500px] md:w-[600px] lg:w-[800px] h-auto"
         />
         <div className="container mx-auto px-4 lg:px-0 relative z-10 flex justify-start items-end h-full pb-10 lg:pb-16">
-          <div className="max-w-2xl mb-12 lg:mb-14 animate-fade-in">
+          <div ref={heroContentRef} className="max-w-2xl mb-12 lg:mb-14">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
               Explore the Beauty of the World
             </h1>
@@ -321,7 +377,7 @@ const Index = () => {
               hotels, flights, and vacation packages.
             </p>
             <div className="flex gap-4">
-              <Button size="lg" className="animate-pulse">Explore Now</Button>
+              <Button size="lg">Explore Now</Button>
               <Button
                 variant="outline"
                 size="lg"
@@ -336,7 +392,7 @@ const Index = () => {
 
       {/* Search Box */}
       <section className="container mx-auto px-4 lg:px-0 -mt-16 relative z-20">
-        <Card className="shadow-lg rounded-xl p-2 animate-fade-in">
+        <Card className="shadow-lg rounded-xl p-2">
           <div className="flex gap-2 mb-4 overflow-x-auto md:overflow-visible">
             <Button
               variant={activeTab === "flights" ? "default" : "ghost"}
@@ -430,7 +486,7 @@ const Index = () => {
       </section>
 
       {/* Popular Destinations */}
-      <section className="container mx-auto px-4 lg:px-0 py-16 animate-on-scroll opacity-0">
+      <section className="container mx-auto px-4 lg:px-0 py-16">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold">
             Popular Destinations
@@ -442,6 +498,7 @@ const Index = () => {
 
         <div ref={popularDestinationsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <TravelCard
+            className="card-item"
             image="/3 Image.png"
             title="Bali, Indonesia"
             description="A beautiful tropical paradise with stunning beaches and vibrant culture."
@@ -449,6 +506,7 @@ const Index = () => {
             rating={4.8}
           />
           <TravelCard
+            className="card-item"
             image="/4 Image.png"
             title="Paris, France"
             description="Explore the city of love with its iconic landmarks and charming streets."
@@ -456,6 +514,7 @@ const Index = () => {
             rating={4.9}
           />
           <TravelCard
+            className="card-item"
             image="/5 Image.png"
             title="Santorini, Greece"
             description="Enjoy breathtaking views of the Aegean Sea from white-washed buildings."
@@ -466,7 +525,7 @@ const Index = () => {
       </section>
 
       {/* Special Offers */}
-      <section className="bg-gray-50 py-16 animate-on-scroll opacity-0">
+      <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">Special Offers</h2>
@@ -477,6 +536,7 @@ const Index = () => {
 
           <div ref={specialOffersRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <TravelCard
+              className="card-item"
               image="/6 Image.png"
               title="Summer Sale"
               description="Up to 30% off on summer vacation packages to tropical destinations."
@@ -485,6 +545,7 @@ const Index = () => {
               rating={4.6}
             />
             <TravelCard
+              className="card-item"
               image="/7 Image.png"
               title="Weekend Getaway"
               description="Perfect short trips to recharge and explore new places."
@@ -493,6 +554,7 @@ const Index = () => {
               rating={4.5}
             />
             <TravelCard
+              className="card-item"
               image="/8 Image.png"
               title="Luxury Retreat"
               description="Experience luxury accommodations with exclusive amenities."
@@ -505,7 +567,7 @@ const Index = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="container mx-auto px-4 lg:px-0 py-16 animate-on-scroll opacity-0">
+      <section className="container mx-auto px-4 lg:px-0 py-16">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             What Our Customers Say
@@ -518,6 +580,7 @@ const Index = () => {
 
         <div ref={testimonialsRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <Testimonial
+            className="card-item"
             name="Sarah Johnson"
             location="New York, USA"
             image="/lady1.jpg"
@@ -525,6 +588,7 @@ const Index = () => {
             text="My trip to Bali was absolutely perfect! Travelo took care of everything and the service was exceptional."
           />
           <Testimonial
+            className="card-item"
             name="David Chen"
             location="Toronto, Canada"
             image="/male.jpg"
@@ -532,6 +596,7 @@ const Index = () => {
             text="The tour packages are well-planned and offer great value. I've used Travelo for three trips now and have never been disappointed."
           />
           <Testimonial
+            className="card-item"
             name="Maria Rodriguez"
             location="Madrid, Spain"
             image="/lady2.jpg"
@@ -542,7 +607,7 @@ const Index = () => {
       </section>
 
       {/* Newsletter */}
-      <section ref={newsletterRef} className="bg-primary py-16 animate-on-scroll opacity-0">
+      <section ref={newsletterRef} className="bg-primary py-16">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -581,7 +646,7 @@ const Index = () => {
       </section>
 
       {/* Contact Us Section */}
-      <section className="py-16 bg-gray-50 animate-on-scroll opacity-0">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 lg:px-0">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Contact Us</h2>

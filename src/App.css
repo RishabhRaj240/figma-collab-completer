@@ -36,7 +36,7 @@
   }
 }
 
-/* Animation Classes */
+/* Animation Classes - Keeping these for legacy components */
 .animate-fade-in {
   animation: fade-in 0.5s ease-out forwards;
 }
@@ -79,4 +79,9 @@
 .story-link:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
+}
+
+/* GSAP-specific styles */
+.gsap-stagger-item {
+  opacity: 0;
 }
